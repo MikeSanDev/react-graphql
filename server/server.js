@@ -13,7 +13,7 @@ const users = [
 // - GraphhQL has a specific language and it all goes in the typeDefs 
 const typeDefs =  `
     type Query {
-        getUsers: [User] 
+        etUsers: [User] 
         getUserById(id: ID!): User
     }
 
