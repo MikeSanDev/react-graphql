@@ -1,9 +1,9 @@
 
 import './App.css'
-// import {useQuery, useMutation} from '@apollo/client';
+import {useQuery, gql  } from '@apollo/client';
 
-const GET_USERS = `
-  query getUsers {
+const GET_USERS = gql`
+  query GetUsers {
     getUsers {
       id
       name
@@ -14,11 +14,23 @@ const GET_USERS = `
 `;
 
 function App() {
+  const { data, error, loading } = useQuery(GET_USERS);
 
+  if (loading) return <p> Data Loading..</p>;
+
+  if (error) return <p>Error: {error.message}</p>
   return (
     <>
       <h1>Users</h1>
-      <div></div>
+      <div> {data.getUsers.map((user) => (
+        <div>
+          <p> Name: {user.name} </p>
+          <p> Age: {user.age} </p>
+          <p> Is this user married?: {user.isMarried ? "Yes" : "No"} </p>
+          </div>
+      ))}
+
+      </div>
     </>
   )
 }
