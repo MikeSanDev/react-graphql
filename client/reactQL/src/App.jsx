@@ -26,6 +26,17 @@ const GET_USER_BY_ID = gql`
   }
 `;
 
+// This GraphQL mutation creates a new user with dynamic input variables and returns the user's name.
+const CREATE_USER = gql`
+ mutation CreateUser($name: String!, $age: Int!, $isMarried: Boolean!) {
+     createUser(name: $name, age: $age, isMarried: $isMarried) {
+      name
+    }
+  }
+`;
+
+
+
 function App() {
   // "Holy trinity" for GET_USERS query:
   // data → actual returned data
