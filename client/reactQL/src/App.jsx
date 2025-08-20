@@ -1,5 +1,5 @@
 import './App.css'
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, gql, useMutation } from '@apollo/client';
 
 // Define GraphQL query for getting all users
 // gql template literal parses the query into a format Apollo understands
@@ -57,16 +57,28 @@ function App() {
     variables: { id: "1" }, // sets the $id in the query above
   });
 
+  const [createUser] = useMutation(CREATE_USER)
+
   // Handle loading state for all users
   if (getUsersLoading) return <p> Data Loading..</p>;
 
   // Handle error state for all users
   if (getUsersError) return <p>Error: {getUsersError.message}</p>
-
+  
+  const handleCreateUser = async () => {
+    createUser()
+  };
+  
   return (
     <>
-      <h1>Users</h1>
 
+  <div>
+    <input placeholder='Name...' />
+    <input placeholder='Age...' type='number'/>
+    <input placeholder='Boolean...' type='number' />
+    <button onClick={handleCreateUser}> Create User </button>
+  </div>
+      <h1>Users</h1>
       <div>
         {/* Conditional rendering for single user query */}
         {getUserByIdLoading ? (
