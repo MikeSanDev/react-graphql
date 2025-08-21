@@ -1,5 +1,6 @@
-import './App.css'
+import './App.css';
 import { useQuery, gql, useMutation } from '@apollo/client';
+import { useState } from 'react';
 
 // Define GraphQL query for getting all users
 // gql template literal parses the query into a format Apollo understands
@@ -35,49 +36,60 @@ const CREATE_USER = gql`
   }
 `;
 
-
-
 function App() {
-  // "Holy trinity" for GET_USERS query:
+   const [newUser, setNewUser] = useState({});
+   
+   // "Holy trinity" for GET_USERS query:
   // data → actual returned data
   // error → holds error info if the request fails
   // loading → boolean while waiting for data
-  const { 
-    data: getUsersData, 
-    error: getUsersError, 
-    loading: getUsersLoading,
+  const {
+     data: getUsersData,
+     error: getUsersError,
+     loading: getUsersLoading,
   } = useQuery(GET_USERS);
 
   // Same thing but for GET_USER_BY_ID, passing variables into the query
-  const { 
-    data: getUserByIdData, 
-    error: getUserByIdError, 
-    loading: getUserByIdLoading, 
-  } = useQuery(GET_USER_BY_ID, {
+  const {
+     data: getUserByIdData,
+     error: getUserByIdError,
+     loading: getUserByIdLoading,
+   } = useQuery(GET_USER_BY_ID, {
     variables: { id: "1" }, // sets the $id in the query above
   });
 
-  const [createUser] = useMutation(CREATE_USER)
+  const [createUser] = useMutation(CREATE_USER);
 
   // Handle loading state for all users
   if (getUsersLoading) return <p> Data Loading..</p>;
 
   // Handle error state for all users
-  if (getUsersError) return <p>Error: {getUsersError.message}</p>
-  
+  if (getUsersError) return <p>Error: {getUsersError.message}</p>;
+     
   const handleCreateUser = async () => {
-    createUser()
+    try {
+      const result = await createUser({
+        variables: {
+          name: newUser.name,
+          age: newUser.age,
+          isMarried: newUser.isMarried
+        }
+      });
+      console.log("User created successfully:", result.data.createUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+    }
   };
-  
+
   return (
     <>
-
-  <div>
-    <input placeholder='Name...' />
-    <input placeholder='Age...' type='number'/>
-    <input placeholder='Boolean...' type='number' />
+   <div>
+    <input placeholder='Name...' onChange={(e) => setNewUser((prev) => ({...prev, name: e.target.value}))} />
+    <input placeholder='Age...' type='number' onChange={(e) => setNewUser((prev) => ({...prev, age: parseInt(e.target.value)}))} />
+    <input placeholder='Is Married (true/false)...' onChange={(e) => setNewUser((prev) => ({...prev, isMarried: e.target.value === 'true'}))} />
     <button onClick={handleCreateUser}> Create User </button>
   </div>
+
       <h1>Users</h1>
       <div>
         {/* Conditional rendering for single user query */}
@@ -96,15 +108,14 @@ function App() {
       </div>
 
       <div>
-        {/* This section currently won’t work — getUserByIdData is an object,
-            so you need to access .getUserById.name, not .name directly */}
+        {/* Fixed to properly access nested data */}
         <h1>Chosen User:</h1>
-        {getUserByIdData.name}
+        {getUserByIdData && !getUserByIdLoading && !getUserByIdError && getUserByIdData.getUserById.name}
       </div>
 
       <div>
         {/* Loop through the array of users from getUsersData */}
-        {getUsersData.getUsers.map((user) => (
+        {getUsersData && getUsersData.getUsers.map((user) => (
           <div key={user.id}> {/* key is important for React lists */}
             <p> Name: {user.name} </p>
             <p> Age: {user.age} </p>
@@ -113,7 +124,7 @@ function App() {
         ))}
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
