@@ -65,9 +65,23 @@ function App() {
 
   // Handle error state for all users
   if (getUsersError) return <p>Error: {getUsersError.message}</p>;
-     
+
   const handleCreateUser = async () => {
+    console.log("Current newUser state:", newUser); // Debug line
+    
+    // Check if all required fields are present
+    if (!newUser.name || newUser.age === undefined || newUser.isMarried === undefined) {
+      console.error("Missing required fields:", newUser);
+      return;
+    }
+    
     try {
+      console.log("Sending mutation with variables:", {
+        name: newUser.name,
+        age: newUser.age,
+        isMarried: newUser.isMarried
+      });
+      
       const result = await createUser({
         variables: {
           name: newUser.name,
@@ -76,6 +90,9 @@ function App() {
         }
       });
       console.log("User created successfully:", result.data.createUser);
+      
+      // Clear form after successful creation
+      setNewUser({});
     } catch (error) {
       console.error("Error creating user:", error);
     }
@@ -84,9 +101,22 @@ function App() {
   return (
     <>
    <div>
-    <input placeholder='Name...' onChange={(e) => setNewUser((prev) => ({...prev, name: e.target.value}))} />
-    <input placeholder='Age...' type='number' onChange={(e) => setNewUser((prev) => ({...prev, age: parseInt(e.target.value)}))} />
-    <input placeholder='Is Married (true/false)...' onChange={(e) => setNewUser((prev) => ({...prev, isMarried: e.target.value === 'true'}))} />
+    <input 
+      placeholder='Name...' 
+      value={newUser.name || ''}
+      onChange={(e) => setNewUser((prev) => ({...prev, name: e.target.value}))} 
+    />
+    <input 
+      placeholder='Age...' 
+      type='number' 
+      value={newUser.age || ''}
+      onChange={(e) => setNewUser((prev) => ({...prev, age: parseInt(e.target.value)}))} 
+    />
+    <input 
+      placeholder='Is Married (true/false)...' 
+      value={newUser.isMarried !== undefined ? newUser.isMarried.toString() : ''}
+      onChange={(e) => setNewUser((prev) => ({...prev, isMarried: e.target.value === 'true'}))} 
+    />
     <button onClick={handleCreateUser}> Create User </button>
   </div>
 

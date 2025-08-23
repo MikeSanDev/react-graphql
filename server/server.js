@@ -3,10 +3,10 @@ import {startStandaloneServer} from "@apollo/server/standalone"
 
 /// local/test data - we can add an api here later
 const users = [
-{ id: "1", name: "Michael Sanchez", age: "31", isMarried: true},
-{ id: "2", name: "Sarah Le", age: "31", isMarried: true},
-{ id: "3", name: "Truffles", age: "11", isMarried: false},
-{ id: "4", name: "Ginny", age: "6", isMarried: false},
+{ id: "1", name: "Michael Sanchez", age: 31, isMarried: true},
+{ id: "2", name: "Sarah Le", age: 31, isMarried: true},
+{ id: "3", name: "Truffles", age: 11, isMarried: false},
+{ id: "4", name: "Ginny", age: 6, isMarried: false},
 ];
 
 /// where our GraphQL goes use back-tick apos 
@@ -44,12 +44,15 @@ const resolvers = {
             const { name, age, isMarried } = args;
             const newUser = {
                 //// creates user and auto adds id by 1+ and convert to a string
-             id: (user.length + 1).toString(),
+             id: (users.length + 1).toString(),
              name,
              age,
              isMarried
             };
-            users.push(newUser);
+          console.log("Created newUser:", newUser); // Debug line
+        users.push(newUser);
+        console.log("Updated users array:", users); // Debug line
+            return newUser;
         },
     },
 };
